@@ -12,7 +12,7 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-zinc-900 w-full h-screen flex items-center justify-center text-zinc-50 px-6 overflow-y-auto">
+    <main className="bg-zinc-900 w-full min-h-screen flex items-center justify-center text-zinc-50 px-6 py-6 xl:p-0 overflow-y-auto">
       <div className="flex justify-between gap-10 xl:gap-24 max-w-5xl flex-col xl:flex-row">
         <section className="flex-1 flex flex-col justify-center">
           <div className="flex items-center">
@@ -29,7 +29,7 @@ export default function Home() {
         </section>
 
         <section className="bg-zinc-800 flex-1 xl:max-w-[480px] rounded-md py-8 px-4 xl:p-16">
-          {isLogin ? <LoginForm /> : <RegisterForm/>} 
+          {isLogin ? <LoginForm /> : <RegisterForm switchLoginMode={handleSwitchLoginMode} />} 
 
           <p className="mt-[18px] m-auto w-fit">
             {isLogin ? "Não tem uma conta? " : "Já tem uma conta? "}

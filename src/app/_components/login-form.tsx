@@ -23,7 +23,7 @@ const formSchema = zod.object({
   email: zod
     .string()
     .email({ message: "Por favor, insira um endereço de email válido." }),
-  password: zod.string().min(3, "A senha deve possuir mais de 6 caracteres"),
+  password: zod.string(),
 });
 
 export function LoginForm() {
@@ -36,7 +36,7 @@ export function LoginForm() {
   });
 
   const handleLogin = () => {
-    console.log(loginForm.getValues().email);
+    console.log(loginForm.getValues().password);
   };
 
   return (
@@ -79,6 +79,7 @@ export function LoginForm() {
                     icon={<LockKeyhole />}
                   />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             );
           }}

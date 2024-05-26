@@ -1,5 +1,6 @@
 "use client";
 
+import { registerUser } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,10 +10,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
+import { IApiError } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LockKeyhole, Mail, User } from "lucide-react";
 import { Roboto } from "next/font/google";
-import { FormEvent } from "react";
 import { useForm } from "react-hook-form";
 import * as zod from "zod";
 
@@ -24,12 +26,23 @@ const formSchema = zod
     email: zod
       .string()
       .email({ message: "Por favor, insira um endereço de email válido." }),
-    password: zod.string(),
+    password: zod
+      .string()
+      .min(6, "A senha deve possuir no mínimo 6 caracteres."),
     confirmPassword: zod.string(),
   })
- ;
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "As senhas não coincidem.",
+    path: ["confirmPassword"],
+  });
 
-export function RegisterForm() {
+interface IRegisterFormProps {
+  switchLoginMode: () => void;
+}
+
+export function RegisterForm({ switchLoginMode }: IRegisterFormProps) {
+  const { toast } = useToast();
+
   const registerForm = useForm<zod.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -40,14 +53,31 @@ export function RegisterForm() {
     },
   });
 
-  const handleRegister = (e: FormEvent) => {
-    e.preventDefault();
-    console.log(registerForm.getValues().email);
+  const handleRegister = async () => {
+    try {
+      await registerUser(registerForm.getValues());
+      toast({
+        title: "Conta criada com sucesso!",
+        variant: "positive",
+      });
+      switchLoginMode();
+    } catch (error) {
+      const apiError = error as IApiError;
+      console.log(apiError);
+      toast({
+        title: "Erro ao criar conta",
+        description: apiError.message,
+        variant: "destructive",
+      });
+    }
   };
 
   return (
     <Form {...registerForm}>
-      <form onSubmit={(e) => handleRegister(e)} className="flex flex-col gap-3">
+      <form
+        onSubmit={registerForm.handleSubmit(handleRegister)}
+        className="flex flex-col gap-3"
+      >
         <FormField
           name="name"
           render={({ field }) => {
@@ -81,6 +111,7 @@ export function RegisterForm() {
                 <FormControl>
                   <Input
                     placeholder="Senha"
+                    type="password"
                     {...field}
                     icon={<LockKeyhole />}
                   />
@@ -98,6 +129,7 @@ export function RegisterForm() {
                 <FormControl>
                   <Input
                     placeholder="Confirme sua senha"
+                    type="password"
                     {...field}
                     icon={<LockKeyhole />}
                   />
