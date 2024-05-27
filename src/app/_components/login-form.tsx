@@ -1,5 +1,6 @@
 "use client";
 
+import { loginUser } from "@/actions/auth";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -9,6 +10,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LockKeyhole, Mail } from "lucide-react";
 import { Roboto } from "next/font/google";
@@ -23,10 +25,12 @@ const formSchema = zod.object({
   email: zod
     .string()
     .email({ message: "Por favor, insira um endereço de email válido." }),
-  password: zod.string(),
+  password: zod.string().min(6, "A senha deve possuir no mínimo 6 caracteres."),
 });
 
 export function LoginForm() {
+  const { toast } = useToast();
+
   const loginForm = useForm<zod.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -35,8 +39,17 @@ export function LoginForm() {
     },
   });
 
-  const handleLogin = () => {
-    console.log(loginForm.getValues().password);
+  const handleLogin = async () => {
+    try {
+      await loginUser(loginForm.getValues());
+      toast({ title: "Logado com sucesso!", variant: "positive" });
+    } catch (e: any) {
+      toast({
+        title: "Dados incorretos!",
+        description: "Verifique seu email e senha!",
+        variant: "destructive",
+      });
+    }
   };
 
   return (

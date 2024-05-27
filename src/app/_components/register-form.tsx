@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { IApiError } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LockKeyhole, Mail, User } from "lucide-react";
 import { Roboto } from "next/font/google";
@@ -61,12 +60,10 @@ export function RegisterForm({ switchLoginMode }: IRegisterFormProps) {
         variant: "positive",
       });
       switchLoginMode();
-    } catch (error) {
-      const apiError = error as IApiError;
-      console.log(apiError);
+    } catch (error: any) {
       toast({
         title: "Erro ao criar conta",
-        description: apiError.message,
+        description: error.message,
         variant: "destructive",
       });
     }

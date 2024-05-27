@@ -4,4 +4,6 @@ export interface IRegisterDTO {
   email: string;
 }
 
-export interface IUserDTO extends Omit<IRegisterDTO, 'password'> {}
+export interface IUserDTO extends Omit<IRegisterDTO, "password"> {}
+
+export interface ILoginDTO extends Omit<IRegisterDTO, "name"> {}
